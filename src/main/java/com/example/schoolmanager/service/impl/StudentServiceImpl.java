@@ -4,15 +4,16 @@ import com.example.schoolmanager.entity.Student;
 import com.example.schoolmanager.repository.StudentRepository;
 import com.example.schoolmanager.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @Transactional
-@SuppressWarnings("null")
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
@@ -41,18 +42,21 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Student getById(UUID id) {
+    public Student getById(@NonNull UUID id) {
+        Objects.requireNonNull(id, "ID không được để trống");
         return studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên với id: " + id));
     }
 
     @Override
-    public Student save(Student student) {
+    public Student save(@NonNull Student student) {
+        Objects.requireNonNull(student, "Sinh viên không được để trống");
         return studentRepository.save(student);
     }
 
     @Override
-    public void delete(UUID id) {
+    public void delete(@NonNull UUID id) {
+        Objects.requireNonNull(id, "ID không được để trống");
         if (!studentRepository.existsById(id)) {
             throw new RuntimeException("Không tìm thấy sinh viên với id: " + id);
         }
