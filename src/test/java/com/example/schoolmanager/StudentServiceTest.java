@@ -40,25 +40,55 @@ class StudentServiceTest {
     }
 
     @Test
-    @DisplayName("Kiểm tra tìm kiếm sinh viên theo từ khóa - search(keyword)")
-    void testSearch() {
-        // Tìm theo tên
+    @DisplayName("Kiểm tra tìm kiếm sinh viên theo họ tên - search(keyword)")
+    void testSearchByName() {
         List<Student> byName = studentService.search("Nguyễn");
         assertEquals(1, byName.size());
         assertEquals("Nguyễn Văn A", byName.get(0).getFullName());
-
-        // Tìm theo mã sinh viên
-        List<Student> byCode = studentService.search("SV002");
-        assertEquals(1, byCode.size());
-        assertEquals("Trần Thị B", byCode.get(0).getFullName());
-
-        // Từ khóa rỗng -> trả về tất cả
-        List<Student> all = studentService.search("");
-        assertEquals(2, all.size());
     }
 
     @Test
-    @DisplayName("Kiểm tra lấy sinh viên theo ID - getById(id)")
+    @DisplayName("Kiểm tra tìm kiếm sinh viên theo mã SV - search(keyword)")
+    void testSearchByStudentCode() {
+        List<Student> byCode = studentService.search("SV002");
+        assertEquals(1, byCode.size());
+        assertEquals("Trần Thị B", byCode.get(0).getFullName());
+    }
+
+    @Test
+    @DisplayName("Kiểm tra tìm kiếm sinh viên theo email - search(keyword)")
+    void testSearchByEmail() {
+        List<Student> byEmail = studentService.search("b@gmail.com");
+        assertEquals(1, byEmail.size());
+        assertEquals("SV002", byEmail.get(0).getStudentCode());
+    }
+
+    @Test
+    @DisplayName("Kiểm tra tìm kiếm sinh viên theo số điện thoại - search(keyword)")
+    void testSearchByPhone() {
+        List<Student> byPhone = studentService.search("0901234567");
+        assertEquals(1, byPhone.size());
+        assertEquals("SV001", byPhone.get(0).getStudentCode());
+    }
+
+    @Test
+    @DisplayName("Kiểm tra tìm kiếm với từ khóa rỗng hoặc khoảng trắng -> trả về tất cả")
+    void testSearchNullOrWhitespace() {
+        assertEquals(2, studentService.search("").size());
+        assertEquals(2, studentService.search("   ").size());
+        assertEquals(2, studentService.search(null).size());
+    }
+
+    @Test
+    @DisplayName("Kiểm tra tìm kiếm không tìm thấy kết quả nào -> trả về mảng rỗng")
+    void testSearchNotFound() {
+        List<Student> notFound = studentService.search("KhongTonTai123");
+        assertNotNull(notFound);
+        assertTrue(notFound.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Kiểm tra lấy sinh viên theo ID hợp lệ - getById(id)")
     void testGetById() {
         Student first = studentRepository.findAll().get(0);
         Student found = studentService.getById(first.getId());
@@ -67,13 +97,36 @@ class StudentServiceTest {
     }
 
     @Test
+    @DisplayName("Kiểm tra lấy sinh viên theo ID không tồn tại -> ném ngoại lệ")
+    void testGetByIdNotFound() {
+        UUID nonExistentId = UUID.randomUUID();
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            studentService.getById(nonExistentId);
+        });
+        assertTrue(exception.getMessage().contains("Không tìm thấy sinh viên"));
+    }
+
+    @Test
     @DisplayName("Kiểm tra thêm mới sinh viên - save(student)")
-    void testSave() {
+    void testSaveNewStudent() {
         Student newStudent = new Student("SV003", "Lê Hoàng C", "c@gmail.com", "0923456789", "C2024C");
         Student saved = studentService.save(newStudent);
         assertNotNull(saved.getId());
         assertEquals("SV003", saved.getStudentCode());
         assertEquals("Lê Hoàng C", saved.getFullName());
+    }
+
+    @Test
+    @DisplayName("Kiểm tra cập nhật sinh viên đã có - save(student)")
+    void testUpdateExistingStudent() {
+        Student existing = studentRepository.findAll().get(0);
+        existing.setFullName("Nguyễn Văn A Đã Sửa");
+        existing.setClassName("C2024_NEW");
+
+        Student updated = studentService.save(existing);
+        assertEquals(existing.getId(), updated.getId());
+        assertEquals("Nguyễn Văn A Đã Sửa", updated.getFullName());
+        assertEquals("C2024_NEW", updated.getClassName());
     }
 
     @Test
@@ -85,6 +138,15 @@ class StudentServiceTest {
 
         assertThrows(RuntimeException.class, () -> {
             studentService.getById(id);
+        });
+    }
+
+    @Test
+    @DisplayName("Kiểm tra xóa sinh viên với ID không tồn tại -> ném ngoại lệ")
+    void testDeleteNotFound() {
+        UUID nonExistentId = UUID.randomUUID();
+        assertThrows(RuntimeException.class, () -> {
+            studentService.delete(nonExistentId);
         });
     }
 }

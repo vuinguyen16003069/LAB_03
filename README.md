@@ -8,7 +8,7 @@
 [![SQL Server](https://img.shields.io/badge/Microsoft_SQL_Server-2025-CC292B?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
 [![Swagger](https://img.shields.io/badge/OpenAPI-Swagger_UI-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](http://localhost:8080/swagger-ui/index.html)
 [![AdminLTE](https://img.shields.io/badge/UI-AdminLTE_v4-3c8dbc?style=for-the-badge&logo=bootstrap&logoColor=white)](http://localhost:8080/admin)
-[![Tests](https://img.shields.io/badge/Tests-11%2F11_Passed-brightgreen?style=for-the-badge&logo=checkmarx&logoColor=white)]()
+[![Tests](https://img.shields.io/badge/Tests-31%2F31_Passed-brightgreen?style=for-the-badge&logo=checkmarx&logoColor=white)]()
 
 <p align="center">
   <b>Hệ thống Quản lý Sinh viên chuẩn hóa theo yêu cầu LAB 03</b><br>
@@ -193,16 +193,16 @@ curl -X POST http://localhost:8080/api/students \
 
 ---
 
-## 🧪 Kiểm Thử Tự Động (Automated Tests)
+## 🧪 Kiểm Thử Tự Động Toàn Diện (31 Automated Tests)
 
-Dự án được trang bị **11 bài kiểm thử tự động** bao phủ từ tầng Service đến tầng Web Controller:
+Dự án được trang bị **31 bài kiểm thử tự động chuyên sâu** bao phủ toàn bộ 4 tầng kiến trúc:
 
 ```bash
 # Windows
-.\mvnw.cmd clean test
+.\mvnw.cmd test
 
 # Linux / macOS
-./mvnw clean test
+./mvnw test
 ```
 
 ```text
@@ -210,12 +210,16 @@ Dự án được trang bị **11 bài kiểm thử tự động** bao phủ t�
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running com.example.schoolmanager.StudentRestControllerTest
-[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0 (REST API Endpoints)
+[INFO] Running com.example.schoolmanager.StudentControllerTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0 (HTML & AdminLTE Views)
+[INFO] Running com.example.schoolmanager.StudentRepositoryTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0 (JPA Queries & Unicode)
 [INFO] Running com.example.schoolmanager.StudentServiceTest
-[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0 (Business Logic & Edge Cases)
 [INFO] 
 [INFO] Results:
-[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 31, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
