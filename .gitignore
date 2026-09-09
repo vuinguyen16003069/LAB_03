@@ -35,3 +35,8 @@ build/
 ### Local Data ###
 data/
 *.db
+
+### Environment Variables ###
+.env
+*.env
+!.env.example

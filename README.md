@@ -1,119 +1,229 @@
-# LAB 03: CRUD API Sinh Viên Dùng Spring Boot & SQL Server
+<div align="center">
 
-Dự án hoàn chỉnh Quản lý Sinh viên chuẩn theo hướng dẫn tại **LAB 03**, sử dụng **Spring Boot 3.4.3**, **Spring Data JPA**, **Microsoft SQL Server**, **Swagger OpenAPI UI**, **Giao diện HTML (Phần B)** và **Giao diện AdminLTE 4 (Phần C)**.
+# 🎓 QUẢN LÝ SINH VIÊN - LAB 03
+### Fullstack Spring Boot 3.4 & Microsoft SQL Server
 
----
+[![Java](https://img.shields.io/badge/Java-17%20%2F%2021%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![SQL Server](https://img.shields.io/badge/Microsoft_SQL_Server-2025-CC292B?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
+[![Swagger](https://img.shields.io/badge/OpenAPI-Swagger_UI-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](http://localhost:8080/swagger-ui/index.html)
+[![AdminLTE](https://img.shields.io/badge/UI-AdminLTE_v4-3c8dbc?style=for-the-badge&logo=bootstrap&logoColor=white)](http://localhost:8080/admin)
+[![Tests](https://img.shields.io/badge/Tests-11%2F11_Passed-brightgreen?style=for-the-badge&logo=checkmarx&logoColor=white)]()
 
-## 🎯 Mục Tiêu Bài Học & Kết Quả Đạt Được (100% Yêu Cầu)
+<p align="center">
+  <b>Hệ thống Quản lý Sinh viên chuẩn hóa theo yêu cầu LAB 03</b><br>
+  Tích hợp đầy đủ RESTful API, Swagger Docs, Giao diện Web HTML và Dashboard AdminLTE 4 hiện đại.
+</p>
 
-- [x] **Phần A. Tạo các API cơ bản kết nối bảng sinh viên trong SQL Server**:
-  - Cơ sở dữ liệu: `quanlysinhvien` trên SQL Server.
-  - Bảng `students`: Khóa chính `id uniqueidentifier` (Java: `UUID`), `student_code`, `full_name`, `email`, `phone`, `class_name`.
-  - Nạp đầy đủ 10 sinh viên mẫu chuẩn UUID (`SV001` đến `SV010`) từ tài liệu.
-  - Xây dựng chuẩn 5 REST API CRUD tại `/api/students`:
-    - `GET /api/students` & `/api/students?keyword=...` : Lấy danh sách hoặc tìm kiếm đa trường.
-    - `GET /api/students/{id}` : Lấy chi tiết sinh viên theo ID.
-    - `POST /api/students` : Thêm sinh viên mới.
-    - `PUT /api/students/{id}` : Cập nhật sinh viên theo ID.
-    - `DELETE /api/students/{id}` : Xóa sinh viên theo ID.
-  - Tích hợp tài liệu API trực quan **Swagger UI** (`springdoc-openapi-starter-webmvc-ui` 2.8.13) tại `http://localhost:8080/swagger-ui/index.html`.
-- [x] **Phần B. Trang web HTML cơ bản quản lý sinh viên**:
-  - Giao diện `students.html` tại `http://localhost:8080/students`.
-  - Hiển thị danh sách sinh viên, tìm kiếm theo từ khóa.
-  - Tích hợp modal Thêm mới, Chỉnh sửa, Xem chi tiết và Xóa sinh viên.
-- [x] **Phần C. Trang web quản lý sinh viên bằng framework AdminLTE 4**:
-  - Giao diện hiện đại chuẩn **AdminLTE v4** (Bootstrap 5) tại `http://localhost:8080/admin`.
-  - Sidebar điều hướng, Header Navbar, Breadcrumb, các widget thống kê (Info box).
-  - Tương tác CRUD 100% với REST API ở Phần A thông qua AJAX / Fetch API (không cần tải lại trang).
-  - Hộp thoại xác nhận và thông báo SweetAlert2 chuyên nghiệp.
+[⚡ Cài Đặt Nhanh](#-hướng-dẫn-cài-đặt--chạy-dự-án-quick-setup) •
+[🏛️ Kiến Trúc Hệ Thống](#%EF%B8%8F-kiến-trúc-hệ-thống) •
+[🔌 Danh Sách REST API](#-danh-sách-rest-api-crud-phần-a) •
+[💻 Giao Diện Người Dùng](#-giao-diện-người-dùng) •
+[🧪 Kiểm Thử Tự Động](#-kiểm-thử-tự-động-automated-tests)
 
 ---
 
-## 🛠️ Công Nghệ Sử Dụng
+</div>
 
-- **Ngôn ngữ**: Java 17 / 21+
-- **Framework**: Spring Boot 3.4.3 (Spring Web, Spring Data JPA, Spring Validation, Thymeleaf)
-- **Tài liệu API**: SpringDoc OpenAPI UI 2.8.13 (Swagger UI)
-- **Cơ sở dữ liệu**:
-  - **Chính thức**: Microsoft SQL Server (Database `quanlysinhvien`)
-  - **Dev/Fallback & Testing**: H2 Database (hỗ trợ kiểu UUID, tự động nạp 10 sinh viên mẫu)
-- **Giao diện**:
-  - **Phần B**: HTML5, Thymeleaf, Bootstrap 5.3.3, Bootstrap Icons
-  - **Phần C**: Framework AdminLTE 4, SweetAlert2, AJAX Fetch API
+## 🎯 Mục Tiêu & Kết Quả Đạt Được
+
+- [x] **Phần A. Xây dựng REST API chuẩn CRUD & Swagger UI**:
+  - Kết nối Spring Boot 3.4 với Microsoft SQL Server 2025.
+  - Bảng `students` với khóa chính `id uniqueidentifier` (UUID chuẩn hóa).
+  - 5 endpoints CRUD + Tìm kiếm đa trường không phân biệt hoa thường.
+  - Tích hợp tài liệu OpenAPI / Swagger UI 3 tương tác trực tiếp.
+- [x] **Phần B. Trang Web HTML Quản Lý Sinh Viên**:
+  - Giao diện thân thiện, hiển thị danh sách sinh viên trực quan.
+  - Hỗ trợ đầy đủ Modal: Thêm mới, Chỉnh sửa, Xem chi tiết và Xác nhận xóa.
+- [x] **Phần C. Trang Web Quản Trị Framework AdminLTE 4**:
+  - Thiết kế Dashboard chuyên nghiệp với **AdminLTE 4** (Bootstrap 5).
+  - Thẻ thống kê (Stat Cards), bộ lọc theo lớp học (`C2024A`, `C2024B`, `C2024C`).
+  - Giao tiếp bất đồng bộ qua AJAX / Fetch API (không giật trang), thông báo SweetAlert2.
+- [x] **Bảo Mật & Best Practices (The Twelve-Factor App)**:
+  - Tách biệt cấu hình mật khẩu sang `.env`, bảo vệ qua `.gitignore`.
+  - Cung cấp sẵn `.env.example` và script cơ sở dữ liệu `database.sql`.
 
 ---
 
-## 🗄️ Cấu Trúc Bảng CSDL (`database.sql`)
+## 🏛️ Kiến Trúc Hệ Thống
 
-```sql
-CREATE DATABASE quanlysinhvien;
-GO
-USE quanlysinhvien;
-GO
+Dự án áp dụng mô hình kiến trúc phân lớp chuẩn của Spring:
 
-CREATE TABLE [dbo].[students](
-    [id] [uniqueidentifier] NOT NULL,
-    [student_code] [nvarchar](50) NOT NULL,
-    [full_name] [nvarchar](255) NOT NULL,
-    [email] [nvarchar](255) NOT NULL,
-    [phone] [varchar](255) NULL,
-    [class_name] [varchar](255) NULL,
-    PRIMARY KEY (id)
-);
-GO
+```mermaid
+graph LR
+    A[Client: Browser / Postman / Swagger] --> B[Controller: StudentRestController / StudentController]
+    B --> C[Service: StudentService / StudentServiceImpl]
+    C --> D[Repository: StudentRepository Spring Data JPA]
+    D --> E[(Microsoft SQL Server: quanlysinhvien)]
 ```
 
-Dữ liệu mẫu gồm 10 sinh viên (`SV001` đến `SV010`) được định nghĩa sẵn trong tệp [database.sql](database.sql) và [data.sql](src/main/resources/data.sql).
+### Cấu trúc thư mục dự án
+
+```text
+schoolmanager/
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/schoolmanager/
+│   │   │   ├── controller/         # StudentRestController (API) & StudentController (Views)
+│   │   │   ├── entity/             # Student entity (khớp bảng students SQL Server)
+│   │   │   ├── repository/         # StudentRepository (JpaRepository<Student, UUID>)
+│   │   │   ├── service/            # StudentService interface & StudentServiceImpl
+│   │   │   └── SchoolmanagerApplication.java
+│   │   └── resources/
+│   │       ├── templates/          # students.html (Phần B) & admin-students.html (Phần C)
+│   │       ├── application.properties # Cấu hình Spring Boot nạp từ .env
+│   │       └── data.sql            # 10 sinh viên mẫu dự phòng
+│   └── test/                       # 11 Unit & Integration tests độc lập
+├── .env.example                    # Template biến môi trường
+├── .gitignore                      # Chặn commit file .env và file nhị phân
+├── database.sql                    # Script tạo DB quanlysinhvien & 10 sinh viên mẫu
+├── pom.xml                         # Quản lý thư viện Maven
+└── README.md
+```
 
 ---
 
-## 🚀 Hướng Dẫn Khởi Chạy Ứng Dụng
+## ⚡ Hướng Dẫn Cài Đặt & Chạy Dự Án (Quick Setup)
 
-### Cách 1: Chạy trực tiếp (Sử dụng dữ liệu mẫu tự động)
-Dự án đã được cấu hình sẵn để có thể chạy ngay lập tức mà không cần cài đặt phức tạp:
+### Bước 1: Tạo CSDL trong SQL Server
+Mở **SQL Server Management Studio (SSMS)** hoặc dùng terminal để chạy tệp [`database.sql`](database.sql):
 ```bash
+sqlcmd -S localhost -U sa -P 123123 -C -i database.sql
+```
+> Script sẽ tự tạo database `quanlysinhvien`, bảng `students` và nạp sẵn **10 sinh viên mẫu** (`SV001` đến `SV010`) đúng định dạng.
+
+---
+
+### Bước 2: Cấu hình biến môi trường (`.env`)
+Tạo file `.env` từ file mẫu `.env.example`:
+```bash
+# Windows PowerShell:
+Copy-Item .env.example .env
+
+# Linux / macOS:
+cp .env.example .env
+```
+Nội dung file `.env` (điều chỉnh thông tin đăng nhập theo máy của bạn nếu cần):
+```env
+DB_HOST=localhost
+DB_PORT=1433
+DB_NAME=quanlysinhvien
+DB_USERNAME=sa
+DB_PASSWORD=123123
+SERVER_PORT=8080
+```
+
+---
+
+### Bước 3: Khởi chạy ứng dụng
+Sử dụng Maven Wrapper đính kèm dự án:
+```bash
+# Windows:
+.\mvnw.cmd spring-boot:run
+
+# Linux / macOS:
 ./mvnw spring-boot:run
 ```
-*(Trên Windows PowerShell: `.\mvnw.cmd spring-boot:run`)*
-
-### Cách 2: Kết nối trực tiếp Microsoft SQL Server
-1. Mở SQL Server Management Studio (SSMS) hoặc `sqlcmd` và thực thi tệp `database.sql`:
-   ```bash
-   sqlcmd -S localhost -U sa -P 123123 -C -i database.sql
-   ```
-2. Khởi chạy ứng dụng với profile `sqlserver`:
-   ```bash
-   ./mvnw spring-boot:run -Dspring-boot.run.profiles=sqlserver
-   ```
+Ứng dụng sẽ khởi động tại cổng `8080` và tự động kết nối vào SQL Server.
 
 ---
 
-## 🌐 Danh Sách Các Đường Dẫn (Endpoints)
+### Bước 4: Trải nghiệm trên trình duyệt
 
-### 1. 🖥️ Giao diện Người dùng
-| Chức năng | Đường dẫn (URL) | Mô tả |
+| Phân hệ | Đường dẫn truy cập | Đặc điểm nổi bật |
 | :--- | :--- | :--- |
-| **Giao diện Phần B** | `http://localhost:8080/students` | Trang web HTML cơ bản quản lý sinh viên |
-| **Giao diện Phần C** | `http://localhost:8080/admin` | Trang quản trị framework **AdminLTE 4** |
-| **Swagger UI** | `http://localhost:8080/swagger-ui/index.html` | Tài liệu tương tác và thử nghiệm REST API |
-
-### 2. 🔌 REST API JSON (Phần A - `/api/students`)
-| STT | Method | API Endpoint | Chức năng |
-| :---: | :---: | :--- | :--- |
-| 1 | `GET` | `/api/students`<br>`/api/students?keyword=...` | Lấy danh sách tất cả sinh viên / Tìm kiếm đa trường (mã SV, họ tên, email, SĐT) |
-| 2 | `GET` | `/api/students/{id}` | Lấy chi tiết sinh viên theo UUID |
-| 3 | `POST` | `/api/students` | Thêm sinh viên mới (Body JSON) |
-| 4 | `PUT` | `/api/students/{id}` | Cập nhật thông tin sinh viên theo UUID (Body JSON) |
-| 5 | `DELETE` | `/api/students/{id}` | Xóa sinh viên theo UUID |
+| **Swagger UI** | [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) | Tài liệu OpenAPI, test API CRUD trực quan |
+| **AdminLTE Dashboard** | [http://localhost:8080/admin](http://localhost:8080/admin) | Quản trị chuyên nghiệp, AJAX CRUD, Stat Cards |
+| **Giao diện HTML** | [http://localhost:8080/students](http://localhost:8080/students) | Trang web danh sách sinh viên chuẩn Phần B |
+| **REST API JSON** | [http://localhost:8080/api/students](http://localhost:8080/api/students) | Dữ liệu thô JSON kết nối trực tiếp CSDL |
 
 ---
 
-## 🧪 Kiểm Thử Tự Động (Unit & Integration Tests)
+## 🔌 Danh Sách REST API CRUD (Phần A)
 
-Chạy toàn bộ bộ test kiểm thử tự động của dự án:
+Mọi API đều có tiền tố: `/api/students`
+
+| STT | Method | Endpoint | Mô tả chức năng |
+| :---: | :---: | :--- | :--- |
+| 1 | `GET` | `/api/students`<br>`/api/students?keyword=...` | Lấy toàn bộ sinh viên hoặc tìm kiếm đa trường (mã SV, họ tên, email, SĐT) |
+| 2 | `GET` | `/api/students/{id}` | Lấy chi tiết thông tin 1 sinh viên theo UUID |
+| 3 | `POST` | `/api/students` | Tạo mới sinh viên (Tự động sinh UUID) |
+| 4 | `PUT` | `/api/students/{id}` | Cập nhật thông tin sinh viên theo UUID |
+| 5 | `DELETE` | `/api/students/{id}` | Xóa vĩnh viễn sinh viên khỏi CSDL theo UUID |
+
+### Ví dụ Request & Response:
+
+#### ➕ Thêm mới sinh viên (`POST /api/students`):
 ```bash
+curl -X POST http://localhost:8080/api/students \
+  -H "Content-Type: application/json" \
+  -d '{
+    "studentCode": "SV011",
+    "fullName": "Phan Hoàng Long",
+    "email": "long@gmail.com",
+    "phone": "0912345678",
+    "className": "C2024A"
+  }'
+```
+
+#### 📥 Response mẫu (`201 Created`):
+```json
+{
+  "id": "c623be80-5a50-4828-98e3-0d322ffb7bc1",
+  "studentCode": "SV011",
+  "fullName": "Phan Hoàng Long",
+  "email": "long@gmail.com",
+  "phone": "0912345678",
+  "className": "C2024A"
+}
+```
+
+---
+
+## 💻 Giao Diện Người Dùng
+
+### 1. Giao diện AdminLTE 4 (`/admin`)
+- **Bộ thẻ thống kê (Info Boxes)**: Tổng số sinh viên, phân bổ theo từng lớp (`C2024A`, `C2024B`, `C2024C`).
+- **Tìm kiếm & Lọc tức thì**: Lọc theo lớp, tìm kiếm từ khóa với cập nhật giao diện AJAX tức thì.
+- **Thao tác không giật trang**: Thêm, Sửa, Xóa thông qua modal pop-up và thông báo Toast SweetAlert2 mượt mà.
+
+### 2. Giao diện HTML cơ bản (`/students`)
+- Chuẩn giao diện theo yêu cầu Phần B của đề bài Lab.
+- Đầy đủ nút tương tác xem chi tiết, chỉnh sửa và xác nhận xóa.
+
+---
+
+## 🧪 Kiểm Thử Tự Động (Automated Tests)
+
+Dự án được trang bị **11 bài kiểm thử tự động** bao phủ từ tầng Service đến tầng Web Controller:
+
+```bash
+# Windows
+.\mvnw.cmd clean test
+
+# Linux / macOS
 ./mvnw clean test
 ```
-Bộ test bao gồm:
-- `StudentServiceTest`: Kiểm tra các phương thức nghiệp vụ (`getAll`, `search`, `getById`, `save`, `delete`).
-- `StudentRestControllerTest`: Kiểm thử tự động toàn bộ 5 REST API HTTP request và response JSON.
+
+```text
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.example.schoolmanager.StudentRestControllerTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Running com.example.schoolmanager.StudentServiceTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] Results:
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+
+---
+
+## 👨‍💻 Thông Tin Dự Án
+- **Môn học**: Phát triển ứng dụng Web với Java (Web Java)
+- **Bài tập**: LAB 03 - CRUD API Sinh viên dùng Spring Boot & SQL Server
+- **Tiêu chuẩn**: Clean Architecture, The Twelve-Factor App Config, RESTful Best Practices.
