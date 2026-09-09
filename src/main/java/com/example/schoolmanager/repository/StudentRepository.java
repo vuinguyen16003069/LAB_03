@@ -1,17 +1,19 @@
 package com.example.schoolmanager.repository;
 
-import com.example.schoolmanager.entity.Student;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.example.schoolmanager.entity.Student;
 
 @Repository
-public interface StudentRepository extends JpaRepository<Student, Integer> {
+public interface StudentRepository extends JpaRepository<Student, UUID> {
 
-    // Bài tập 3: Tìm kiếm sinh viên theo tên (không phân biệt chữ hoa chữ thường)
-    List<Student> findByNameContainingIgnoreCase(String keyword);
-
-    // Tìm kiếm theo giới tính
-    List<Student> findByGenderIgnoreCase(String gender);
+    List<Student> findByStudentCodeContainingIgnoreCaseOrFullNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCase(
+            String studentCode,
+            String fullName,
+            String email,
+            String phone);
 }

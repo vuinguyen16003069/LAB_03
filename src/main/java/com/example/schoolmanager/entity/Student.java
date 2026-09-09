@@ -1,87 +1,88 @@
 package com.example.schoolmanager.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "students")
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
+    private UUID id;
 
-    @NotBlank(message = "Họ và tên không được để trống")
-    @Size(max = 100, message = "Họ và tên tối đa 100 ký tự")
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    @Column(name = "student_code")
+    private String studentCode;
 
-    @NotNull(message = "Tuổi không được để trống")
-    @Min(value = 1, message = "Tuổi phải lớn hơn 0")
-    @Column(name = "age", nullable = false)
-    private Integer age;
+    @Column(name = "full_name")
+    private String fullName;
 
-    @NotBlank(message = "Email không được để trống")
-    @Email(message = "Email không đúng định dạng")
-    @Size(max = 100, message = "Email tối đa 100 ký tự")
-    @Column(name = "email", nullable = false, length = 100)
+    @Column(name = "email")
     private String email;
 
-    // Bài tập 1: Thêm cột giới tính (Nam / Nữ / Khác)
-    @Column(name = "gender", length = 10)
-    private String gender;
+    @Column(name = "phone")
+    private String phone;
 
-    // Constructors
+    @Column(name = "class_name")
+    private String className;
+
     public Student() {
     }
 
-    public Student(String name, Integer age, String email, String gender) {
-        this.name = name;
-        this.age = age;
+    public Student(String studentCode, String fullName, String email, String phone, String className) {
+        this.studentCode = studentCode;
+        this.fullName = fullName;
         this.email = email;
-        this.gender = gender;
+        this.phone = phone;
+        this.className = className;
     }
 
-    public Student(Integer id, String name, Integer age, String email, String gender) {
+    public Student(UUID id, String studentCode, String fullName, String email, String phone, String className) {
         this.id = id;
-        this.name = name;
-        this.age = age;
+        this.studentCode = studentCode;
+        this.fullName = fullName;
         this.email = email;
-        this.gender = gender;
+        this.phone = phone;
+        this.className = className;
     }
 
-    // Getters and Setters
-    public Integer getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
+    public String getStudentCode() {
+        return studentCode;
+    }
+
+    public void setStudentCode(String studentCode) {
+        this.studentCode = studentCode;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     public String getName() {
-        return name;
+        return fullName;
     }
 
     public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
+        this.fullName = name;
     }
 
     public String getEmail() {
@@ -92,22 +93,31 @@ public class Student {
         this.email = email;
     }
 
-    public String getGender() {
-        return gender;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     @Override
     public String toString() {
         return "Student{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", age=" + age +
+                ", studentCode='" + studentCode + '\'' +
+                ", fullName='" + fullName + '\'' +
                 ", email='" + email + '\'' +
-                ", gender='" + gender + '\'' +
+                ", phone='" + phone + '\'' +
+                ", className='" + className + '\'' +
                 '}';
     }
 }

@@ -11,12 +11,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@SuppressWarnings("null")
 class StudentServiceTest {
 
     @Autowired
@@ -28,51 +29,63 @@ class StudentServiceTest {
     @BeforeEach
     void setUp() {
         studentRepository.deleteAll();
-        studentRepository.save(new Student("Nguyễn Văn A", 20, "a@gmail.com", "Nam"));
-        studentRepository.save(new Student("Trần Thị B", 21, "b@gmail.com", "Nữ"));
+        studentRepository.save(new Student("SV001", "Nguyễn Văn A", "a@gmail.com", "0901234567", "C2024A"));
+        studentRepository.save(new Student("SV002", "Trần Thị B", "b@gmail.com", "0912345678", "C2024B"));
     }
 
     @Test
-    @DisplayName("Kiểm tra lấy toàn bộ danh sách sinh viên")
-    void testGetAllStudents() {
-        List<Student> list = studentService.getAllStudents();
+    @DisplayName("Kiểm tra lấy toàn bộ danh sách sinh viên - getAll()")
+    void testGetAll() {
+        List<Student> list = studentService.getAll();
         assertEquals(2, list.size());
     }
 
     @Test
-    @DisplayName("Kiểm tra tìm kiếm sinh viên theo tên")
-    void testSearchStudents() {
-        List<Student> result = studentService.searchStudents("Nguyễn");
-        assertEquals(1, result.size());
-        assertEquals("Nguyễn Văn A", result.get(0).getName());
+    @DisplayName("Kiểm tra tìm kiếm sinh viên theo từ khóa - search(keyword)")
+    void testSearch() {
+        // Tìm theo tên
+        List<Student> byName = studentService.search("Nguyễn");
+        assertEquals(1, byName.size());
+        assertEquals("Nguyễn Văn A", byName.get(0).getFullName());
+
+        // Tìm theo mã sinh viên
+        List<Student> byCode = studentService.search("SV002");
+        assertEquals(1, byCode.size());
+        assertEquals("Trần Thị B", byCode.get(0).getFullName());
+
+        // Từ khóa rỗng -> trả về tất cả
+        List<Student> all = studentService.search("");
+        assertEquals(2, all.size());
     }
 
     @Test
-    @DisplayName("Kiểm tra thêm mới sinh viên")
-    void testSaveStudent() {
-        Student newStudent = new Student("Lê Văn C", 22, "c@gmail.com", "Nam");
-        Student saved = studentService.saveStudent(newStudent);
+    @DisplayName("Kiểm tra lấy sinh viên theo ID - getById(id)")
+    void testGetById() {
+        Student first = studentRepository.findAll().get(0);
+        Student found = studentService.getById(first.getId());
+        assertNotNull(found);
+        assertEquals(first.getStudentCode(), found.getStudentCode());
+    }
+
+    @Test
+    @DisplayName("Kiểm tra thêm mới sinh viên - save(student)")
+    void testSave() {
+        Student newStudent = new Student("SV003", "Lê Hoàng C", "c@gmail.com", "0923456789", "C2024C");
+        Student saved = studentService.save(newStudent);
         assertNotNull(saved.getId());
-        assertEquals("Lê Văn C", saved.getName());
+        assertEquals("SV003", saved.getStudentCode());
+        assertEquals("Lê Hoàng C", saved.getFullName());
     }
 
     @Test
-    @DisplayName("Kiểm tra cập nhật sinh viên")
-    void testUpdateStudent() {
-        List<Student> list = studentService.getAllStudents();
-        Student first = list.get(0);
-        first.setName("Nguyễn Văn A - Updated");
-        Student updated = studentService.updateStudent(first.getId(), first);
-        assertEquals("Nguyễn Văn A - Updated", updated.getName());
-    }
+    @DisplayName("Kiểm tra xóa sinh viên - delete(id)")
+    void testDelete() {
+        Student first = studentRepository.findAll().get(0);
+        UUID id = first.getId();
+        studentService.delete(id);
 
-    @Test
-    @DisplayName("Kiểm tra xóa sinh viên")
-    void testDeleteStudent() {
-        List<Student> list = studentService.getAllStudents();
-        Integer id = list.get(0).getId();
-        studentService.deleteStudent(id);
-        Optional<Student> deleted = studentService.getStudentById(id);
-        assertTrue(deleted.isEmpty());
+        assertThrows(RuntimeException.class, () -> {
+            studentService.getById(id);
+        });
     }
 }

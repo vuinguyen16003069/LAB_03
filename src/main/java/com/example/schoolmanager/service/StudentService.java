@@ -3,19 +3,17 @@ package com.example.schoolmanager.service;
 import com.example.schoolmanager.entity.Student;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 public interface StudentService {
 
-    List<Student> getAllStudents();
+    List<Student> getAll();
 
-    Optional<Student> getStudentById(Integer id);
+    List<Student> search(String keyword);
 
-    Student saveStudent(Student student);
+    Student getById(UUID id);
 
-    Student updateStudent(Integer id, Student student);
+    Student save(Student student);
 
-    void deleteStudent(Integer id);
-
-    List<Student> searchStudents(String keyword);
+    void delete(UUID id);
 }

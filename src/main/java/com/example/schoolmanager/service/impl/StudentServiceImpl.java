@@ -8,10 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
+@SuppressWarnings("null")
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
@@ -23,46 +24,38 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Student> getAllStudents() {
+    public List<Student> getAll() {
         return studentRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Student> getStudentById(Integer id) {
-        return studentRepository.findById(id);
-    }
-
-    @Override
-    public Student saveStudent(Student student) {
-        return studentRepository.save(student);
-    }
-
-    @Override
-    public Student updateStudent(Integer id, Student studentDetails) {
-        return studentRepository.findById(id).map(student -> {
-            student.setName(studentDetails.getName());
-            student.setAge(studentDetails.getAge());
-            student.setEmail(studentDetails.getEmail());
-            student.setGender(studentDetails.getGender());
-            return studentRepository.save(student);
-        }).orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên với ID: " + id));
-    }
-
-    @Override
-    public void deleteStudent(Integer id) {
-        if (!studentRepository.existsById(id)) {
-            throw new RuntimeException("Không tìm thấy sinh viên với ID: " + id);
+    public List<Student> search(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return studentRepository.findAll();
         }
-        studentRepository.deleteById(id);
+        String value = keyword.trim();
+        return studentRepository.findByStudentCodeContainingIgnoreCaseOrFullNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCase(
+                value, value, value, value);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Student> searchStudents(String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return studentRepository.findAll();
+    public Student getById(UUID id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên với id: " + id));
+    }
+
+    @Override
+    public Student save(Student student) {
+        return studentRepository.save(student);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        if (!studentRepository.existsById(id)) {
+            throw new RuntimeException("Không tìm thấy sinh viên với id: " + id);
         }
-        return studentRepository.findByNameContainingIgnoreCase(keyword.trim());
+        studentRepository.deleteById(id);
     }
 }

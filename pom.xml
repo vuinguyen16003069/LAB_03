@@ -53,6 +53,13 @@
 			<artifactId>h2</artifactId>
 		</dependency>
 
+		<!-- SpringDoc OpenAPI (Swagger UI) - Theo yêu cầu Bước 9 của LAB 03 -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.8.13</version>
+		</dependency>
+
 		<!-- Spring Boot Test Starter -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

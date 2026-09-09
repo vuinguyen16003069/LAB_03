@@ -2,94 +2,75 @@ package com.example.schoolmanager.controller;
 
 import com.example.schoolmanager.entity.Student;
 import com.example.schoolmanager.service.StudentService;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/students")
 @CrossOrigin(origins = "*")
+@Tag(name = "Student API", description = "Các API CRUD Quản lý Sinh viên (LAB 03 - Phần A)")
 public class StudentRestController {
 
-    private final StudentService studentService;
-
     @Autowired
-    public StudentRestController(StudentService studentService) {
-        this.studentService = studentService;
-    }
+    private StudentService studentService;
 
-    // 1. GET /api/students hoặc /api/students?keyword=Nguyen
-    // Lấy toàn bộ danh sách sinh viên hoặc tìm kiếm theo từ khóa
+    // 1. GET /api/students hoặc /api/students?keyword=...
+    // Lấy tất cả sinh viên / Tìm kiếm sinh viên
     @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents(
-            @RequestParam(name = "keyword", required = false) String keyword) {
-        List<Student> list = studentService.searchStudents(keyword);
-        return ResponseEntity.ok(list);
+    @Operation(summary = "Lấy danh sách tất cả sinh viên hoặc tìm kiếm theo từ khóa", 
+               description = "Tìm kiếm không phân biệt hoa thường trên các trường: studentCode, fullName, email, phone")
+    public List<Student> listStudents(
+            @Parameter(description = "Từ khóa tìm kiếm (mã SV, họ tên, email, sđt)")
+            @RequestParam(required = false) String keyword) {
+        return studentService.search(keyword);
     }
 
     // 2. GET /api/students/{id}
-    // Lấy thông tin chi tiết sinh viên theo ID
+    // Lấy thông tin sinh viên theo ID (UUID)
     @GetMapping("/{id}")
-    public ResponseEntity<?> getStudentById(@PathVariable Integer id) {
-        return studentService.getStudentById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(null));
+    @Operation(summary = "Lấy thông tin chi tiết sinh viên theo ID (UUID)")
+    public Student getStudent(
+            @Parameter(description = "UUID định danh của sinh viên")
+            @PathVariable UUID id) {
+        return studentService.getById(id);
     }
 
     // 3. POST /api/students
-    // Tạo mới một sinh viên
+    // Thêm sinh viên mới
     @PostMapping
-    public ResponseEntity<?> createStudent(@Valid @RequestBody Student student) {
-        student.setId(null); // Đảm bảo tạo mới ID tự tăng
-        Student savedStudent = studentService.saveStudent(student);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Thêm sinh viên mới")
+    public Student createStudent(@RequestBody Student student) {
+        student.setId(null); // Đảm bảo tự tạo UUID mới nếu chưa có
+        return studentService.save(student);
     }
 
     // 4. PUT /api/students/{id}
-    // Cập nhật thông tin sinh viên theo ID
+    // Cập nhật thông tin sinh viên
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateStudent(
-            @PathVariable Integer id,
-            @Valid @RequestBody Student student) {
-        try {
-            Student updated = studentService.updateStudent(id, student);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        }
+    @Operation(summary = "Cập nhật thông tin sinh viên theo ID")
+    public Student updateStudent(
+            @Parameter(description = "UUID của sinh viên cần cập nhật")
+            @PathVariable UUID id,
+            @RequestBody Student student) {
+        student.setId(id);
+        return studentService.save(student);
     }
 
     // 5. DELETE /api/students/{id}
     // Xóa sinh viên theo ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteStudent(@PathVariable Integer id) {
-        try {
-            studentService.deleteStudent(id);
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Đã xóa sinh viên có ID: " + id);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        }
+    @Operation(summary = "Xóa sinh viên theo ID")
+    public void deleteStudent(
+            @Parameter(description = "UUID của sinh viên cần xóa")
+            @PathVariable UUID id) {
+        studentService.delete(id);
     }
 }

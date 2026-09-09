@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@SuppressWarnings("null")
 class StudentRestControllerTest {
 
     @Autowired
@@ -34,62 +35,76 @@ class StudentRestControllerTest {
     @BeforeEach
     void setUp() {
         studentRepository.deleteAll();
-        studentRepository.save(new Student("Nguyễn Văn A", 20, "a@gmail.com", "Nam"));
-        studentRepository.save(new Student("Trần Thị B", 21, "b@gmail.com", "Nữ"));
+        studentRepository.save(new Student("SV001", "Nguyễn Văn A", "a@gmail.com", "0901234567", "C2024A"));
+        studentRepository.save(new Student("SV002", "Trần Thị B", "b@gmail.com", "0912345678", "C2024B"));
     }
 
     @Test
-    @DisplayName("REST API GET /api/students - Lấy toàn bộ danh sách JSON")
+    @DisplayName("API 1: GET /api/students - Lấy toàn bộ danh sách JSON")
     void testGetAllStudentsApi() throws Exception {
         mockMvc.perform(get("/api/students"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("Nguyễn Văn A")));
+                .andExpect(jsonPath("$[0].studentCode", is("SV001")))
+                .andExpect(jsonPath("$[0].fullName", is("Nguyễn Văn A")));
     }
 
     @Test
-    @DisplayName("REST API GET /api/students?keyword=Trần - Tìm kiếm sinh viên")
+    @DisplayName("API 1b: GET /api/students?keyword=Trần - Tìm kiếm sinh viên")
     void testSearchStudentsApi() throws Exception {
         mockMvc.perform(get("/api/students").param("keyword", "Trần"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("Trần Thị B")));
+                .andExpect(jsonPath("$[0].studentCode", is("SV002")))
+                .andExpect(jsonPath("$[0].fullName", is("Trần Thị B")));
     }
 
     @Test
-    @DisplayName("REST API POST /api/students - Tạo sinh viên mới")
+    @DisplayName("API 2: GET /api/students/{id} - Lấy chi tiết sinh viên theo ID")
+    void testGetStudentByIdApi() throws Exception {
+        Student student = studentRepository.findAll().get(0);
+
+        mockMvc.perform(get("/api/students/" + student.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(student.getId().toString())))
+                .andExpect(jsonPath("$.studentCode", is(student.getStudentCode())))
+                .andExpect(jsonPath("$.fullName", is(student.getFullName())));
+    }
+
+    @Test
+    @DisplayName("API 3: POST /api/students - Tạo sinh viên mới")
     void testCreateStudentApi() throws Exception {
-        Student newStudent = new Student("Phạm Văn C", 23, "c@gmail.com", "Nam");
+        Student newStudent = new Student("SV003", "Lê Hoàng C", "c@gmail.com", "0923456789", "C2024C");
 
         mockMvc.perform(post("/api/students")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newStudent)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.name", is("Phạm Văn C")));
+                .andExpect(jsonPath("$.studentCode", is("SV003")))
+                .andExpect(jsonPath("$.fullName", is("Lê Hoàng C")));
     }
 
     @Test
-    @DisplayName("REST API PUT /api/students/{id} - Cập nhật sinh viên")
+    @DisplayName("API 4: PUT /api/students/{id} - Cập nhật thông tin sinh viên")
     void testUpdateStudentApi() throws Exception {
         Student student = studentRepository.findAll().get(0);
-        student.setName("Nguyễn Văn A - Edited");
+        student.setFullName("Nguyễn Văn A - Cập nhật");
 
         mockMvc.perform(put("/api/students/" + student.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(student)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("Nguyễn Văn A - Edited")));
+                .andExpect(jsonPath("$.fullName", is("Nguyễn Văn A - Cập nhật")));
     }
 
     @Test
-    @DisplayName("REST API DELETE /api/students/{id} - Xóa sinh viên")
+    @DisplayName("API 5: DELETE /api/students/{id} - Xóa sinh viên")
     void testDeleteStudentApi() throws Exception {
         Student student = studentRepository.findAll().get(0);
 
         mockMvc.perform(delete("/api/students/" + student.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message", containsString("Đã xóa sinh viên")));
+                .andExpect(status().isOk());
     }
 }

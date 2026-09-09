@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAB 03 - AdminLTE 4 Quản Lý Sinh Viên (Phần C)</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- AdminLTE 4 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-beta3/dist/css/adminlte.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        .badge-code {
+            font-family: monospace;
+            background-color: #e0f2fe;
+            color: #0284c7;
+            font-weight: 700;
+            padding: 0.35rem 0.6rem;
+            border-radius: 4px;
+        }
+        .badge-class {
+            background-color: #fef3c7;
+            color: #b45309;
+            font-weight: 600;
+            padding: 0.35rem 0.6rem;
+            border-radius: 4px;
+        }
+        .small-box {
+            border-radius: 0.75rem;
+            position: relative;
+            display: block;
+            margin-bottom: 20px;
+            box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+            color: #fff;
+            padding: 1.25rem;
+            overflow: hidden;
+        }
+        .small-box .inner {
+            position: relative;
+            z-index: 2;
+        }
+        .small-box .icon {
+            position: absolute;
+            right: 15px;
+            bottom: 10px;
+            font-size: 4rem;
+            opacity: 0.25;
+            z-index: 1;
+        }
+        .small-box-footer {
+            display: block;
+            padding: 4px 0;
+            margin-top: 10px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .small-box-footer:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper">
+
+        <!-- ========================================================== -->
+        <!-- 1. NAVBAR TRÊN CÙNG -->
+        <!-- ========================================================== -->
+        <nav class="app-header navbar navbar-expand bg-body shadow-sm">
+            <div class="container-fluid">
+                <!-- Start navbar links -->
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                            <i class="bi bi-list fs-4"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-md-block">
+                        <a th:href="@{/students}" class="nav-link text-primary fw-semibold">
+                            <i class="bi bi-arrow-left-circle me-1"></i> Giao diện cơ bản (Phần B)
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-md-block">
+                        <a th:href="@{/swagger-ui/index.html}" target="_blank" class="nav-link text-success">
+                            <i class="bi bi-file-earmark-code me-1"></i> Swagger UI ↗
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-md-block">
+                        <a th:href="@{/api/students}" target="_blank" class="nav-link text-info">
+                            <i class="bi bi-braces me-1"></i> REST API (/api/students) ↗
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- End navbar links -->
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                            <i class="bi bi-circle-fill me-1 small"></i> SQL Server: Connected
+                        </span>
+                    </li>
+                    <li class="nav-item dropdown user-menu ms-3">
+                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <span class="d-none d-md-inline fw-semibold">Giảng viên / Admin</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li class="user-header bg-primary text-white text-center p-3">
+                                <p class="mb-0 fw-bold">LAB 03 - Spring Boot</p>
+                                <small>Đại học Đông Á - UDA</small>
+                            </li>
+                            <li class="user-footer p-2 text-center">
+                                <a th:href="@{/students}" class="btn btn-sm btn-outline-primary w-100">Về trang sinh viên</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- ========================================================== -->
+        <!-- 2. SIDEBAR BÊN TRÁI -->
+        <!-- ========================================================== -->
+        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+            <div class="sidebar-brand p-3 border-bottom border-secondary">
+                <a th:href="@{/admin}" class="brand-link text-decoration-none text-white d-flex align-items-center gap-2">
+                    <i class="bi bi-mortarboard-fill fs-3 text-warning"></i>
+                    <span class="brand-text fw-bold fs-5">AdminLTE 4</span>
+                </a>
+            </div>
+            <div class="sidebar-wrapper p-3">
+                <nav class="mt-2">
+                    <ul class="nav sidebar-menu flex-column gap-1" data-lte-toggle="treeview" role="menu" data-accordion="false">
+                        <li class="nav-header text-uppercase text-secondary small fw-bold px-2 mb-2">QUẢN TRỊ HỆ THỐNG</li>
+                        <li class="nav-item">
+                            <a th:href="@{/admin}" class="nav-link active rounded">
+                                <i class="nav-icon bi bi-people-fill text-info me-2"></i>
+                                <p class="mb-0">Quản Lý Sinh Viên</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a th:href="@{/students}" class="nav-link rounded">
+                                <i class="nav-icon bi bi-layout-text-window-reverse text-warning me-2"></i>
+                                <p class="mb-0">Giao diện cơ bản (Phần B)</p>
+                            </a>
+                        </li>
+                        <li class="nav-header text-uppercase text-secondary small fw-bold px-2 mt-3 mb-2">TÀI LIỆU & API</li>
+                        <li class="nav-item">
+                            <a th:href="@{/swagger-ui/index.html}" target="_blank" class="nav-link rounded">
+                                <i class="nav-icon bi bi-journal-code text-success me-2"></i>
+                                <p class="mb-0">Swagger UI Docs ↗</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a th:href="@{/api/students}" target="_blank" class="nav-link rounded">
+                                <i class="nav-icon bi bi-braces-asterisk text-primary me-2"></i>
+                                <p class="mb-0">Endpoint /api/students ↗</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- ========================================================== -->
+        <!-- 3. NỘI DUNG CHÍNH (CONTENT) -->
+        <!-- ========================================================== -->
+        <main class="app-main">
+            <!-- Content Header (Page header) -->
+            <div class="app-content-header py-3 bg-white border-bottom mb-4">
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0 fw-bold text-dark">
+                                <i class="bi bi-person-lines-fill text-primary me-2"></i>Quản Lý Sinh Viên (Phần C)
+                            </h3>
+                            <small class="text-muted">Giao diện framework AdminLTE 4 tương tác trực tiếp với các REST API ở Phần A.</small>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end mb-0">
+                                <li class="breadcrumb-item"><a th:href="@{/admin}">Trang chủ</a></li>
+                                <li class="breadcrumb-item"><a th:href="@{/students}">Sinh viên</a></li>
+                                <li class="breadcrumb-item active">AdminLTE 4</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main app content -->
+            <div class="app-content">
+                <div class="container-fluid">
+
+                    <!-- Info Boxes / Widgets -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="small-box bg-primary">
+                                <div class="inner">
+                                    <h3 id="statTotalStudents" class="fw-bold mb-1">10</h3>
+                                    <p class="mb-0">Tổng số sinh viên</p>
+                                </div>
+                                <i class="icon bi bi-mortarboard"></i>
+                                <a href="javascript:void(0)" onclick="refreshData()" class="small-box-footer">
+                                    Làm mới danh sách <i class="bi bi-arrow-clockwise ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3 id="statTotalClasses" class="fw-bold mb-1">3</h3>
+                                    <p class="mb-0">Lớp học (C2024A, B, C)</p>
+                                </div>
+                                <i class="icon bi bi-building"></i>
+                                <a href="javascript:void(0)" class="small-box-footer">Dữ liệu phân bổ theo lớp</a>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="small-box bg-warning text-dark">
+                                <div class="inner">
+                                    <h3 id="statPhonePercent" class="fw-bold mb-1">100%</h3>
+                                    <p class="mb-0">Có số điện thoại</p>
+                                </div>
+                                <i class="icon bi bi-telephone"></i>
+                                <a href="javascript:void(0)" class="small-box-footer text-dark">Tỉ lệ liên lạc đầy đủ</a>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="small-box bg-danger">
+                                <div class="inner">
+                                    <h3 class="fw-bold mb-1">REST API</h3>
+                                    <p class="mb-0">CRUD Tự động AJAX</p>
+                                </div>
+                                <i class="icon bi bi-lightning-charge"></i>
+                                <a th:href="@{/swagger-ui/index.html}" target="_blank" class="small-box-footer">
+                                    Xem Swagger Docs <i class="bi bi-arrow-right-circle ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Data Table Card -->
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white py-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <h5 class="card-title fw-bold mb-0 text-dark">
+                                    <i class="bi bi-table me-2 text-primary"></i>Danh Sách Sinh Viên Trong CSDL
+                                </h5>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button class="btn btn-primary fw-semibold shadow-sm" onclick="openAddModal()">
+                                        <i class="bi bi-plus-circle me-1"></i> Thêm Sinh Viên Mới
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="refreshData()" title="Tải lại dữ liệu">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Filters & Search Bar -->
+                        <div class="card-body border-bottom bg-light py-2">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-5">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                                        <input type="text" id="searchInput" class="form-control" 
+                                               placeholder="Tìm theo mã SV, họ tên, email, SĐT..." onkeyup="handleSearchKey(event)">
+                                        <button class="btn btn-outline-primary" onclick="searchStudents()">Tìm kiếm</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <label class="input-group-text bg-white">Lọc theo Lớp:</label>
+                                        <select id="classFilter" class="form-select" onchange="filterByClass()">
+                                            <option value="">-- Tất cả các lớp --</option>
+                                            <option value="C2024A">Lớp C2024A</option>
+                                            <option value="C2024B">Lớp C2024B</option>
+                                            <option value="C2024C">Lớp C2024C</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-md-end text-muted small">
+                                    Hiển thị: <strong id="studentCount">0</strong> sinh viên
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" id="studentsTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 130px;">MÃ SV</th>
+                                            <th>HỌ VÀ TÊN</th>
+                                            <th>EMAIL</th>
+                                            <th>SỐ ĐIỆN THOẠI</th>
+                                            <th style="width: 120px;">LỚP HỌC</th>
+                                            <th style="width: 160px;" class="text-center">THAO TÁC</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentsTableBody">
+                                        <tr>
+                                            <td colspan="6" class="text-center py-5">
+                                                <div class="spinner-border text-primary" role="status"></div>
+                                                <div class="mt-2 text-muted">Đang tải dữ liệu từ API /api/students...</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="card-footer bg-white text-muted small py-3 d-flex justify-content-between align-items-center">
+                            <div><i class="bi bi-info-circle me-1"></i> Dữ liệu tự động cập nhật qua REST API (JSON) không tải lại trang.</div>
+                            <div class="font-monospace">Spring Boot 3.4.3 & SQL Server</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+
+        <!-- ========================================================== -->
+        <!-- 4. FOOTER -->
+        <!-- ========================================================== -->
+        <footer class="app-footer text-muted py-3 bg-white border-top text-center small">
+            <div class="float-end d-none d-sm-inline me-3">LAB 03: CRUD API Sinh Viên</div>
+            <strong>Bản quyền &copy; 2026 Đại học Đông Á - UDA.</strong> Quản lý đào tạo.
+        </footer>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- MODAL 1: THÊM SINH VIÊN (AJAX POST /api/students) -->
+    <!-- ========================================================== -->
+    <div class="modal fade" id="modalAddStudent" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus-fill me-2"></i>Thêm Sinh Viên Mới</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formAddStudent" onsubmit="submitAddStudent(event)">
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Mã Sinh Viên <span class="text-danger">*</span></label>
+                            <input type="text" id="add_studentCode" class="form-control" required placeholder="Ví dụ: SV011">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Họ và Tên <span class="text-danger">*</span></label>
+                            <input type="text" id="add_fullName" class="form-control" required placeholder="Ví dụ: Nguyễn Văn Hoàng">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                            <input type="email" id="add_email" class="form-control" required placeholder="Ví dụ: hoang@gmail.com">
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Số điện thoại</label>
+                                <input type="text" id="add_phone" class="form-control" placeholder="Ví dụ: 0912345678">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Lớp học</label>
+                                <input type="text" id="add_className" class="form-control" placeholder="Ví dụ: C2024A">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i> Lưu (POST /api/students)
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- MODAL 2: CHỈNH SỬA SINH VIÊN (AJAX PUT /api/students/{id}) -->
+    <!-- ========================================================== -->
+    <div class="modal fade" id="modalEditStudent" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Chỉnh Sửa Sinh Viên</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formEditStudent" onsubmit="submitEditStudent(event)">
+                    <input type="hidden" id="edit_id">
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Mã Sinh Viên <span class="text-danger">*</span></label>
+                            <input type="text" id="edit_studentCode" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Họ và Tên <span class="text-danger">*</span></label>
+                            <input type="text" id="edit_fullName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                            <input type="email" id="edit_email" class="form-control" required>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Số điện thoại</label>
+                                <input type="text" id="edit_phone" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Lớp học</label>
+                                <input type="text" id="edit_className" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary fw-semibold">
+                            <i class="bi bi-save me-1"></i> Cập Nhật (PUT /api/students)
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- MODAL 3: XEM CHI TIẾT SINH VIÊN (AJAX GET /api/students/{id}) -->
+    <!-- ========================================================== -->
+    <div class="modal fade" id="modalViewStudent" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-badge me-2"></i>Hồ Sơ Sinh Viên</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="avatar bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 70px; height: 70px; font-size: 1.8rem;">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <h4 id="view_fullName" class="fw-bold mb-0">--</h4>
+                        <span id="view_studentCode" class="badge bg-primary font-monospace mt-1 fs-6">--</span>
+                    </div>
+
+                    <ul class="list-group list-group-flush border-top border-bottom">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <span class="text-muted"><i class="bi bi-envelope me-2"></i>Email</span>
+                            <span id="view_email" class="fw-semibold">--</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <span class="text-muted"><i class="bi bi-telephone me-2"></i>Số điện thoại</span>
+                            <span id="view_phone" class="fw-semibold">--</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <span class="text-muted"><i class="bi bi-building me-2"></i>Lớp học</span>
+                            <span id="view_className" class="badge bg-warning text-dark">--</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            <span class="text-muted"><i class="bi bi-key me-2"></i>UUID ID</span>
+                            <span id="view_id" class="small font-monospace text-muted text-break">--</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-beta3/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        let allStudents = [];
+
+        // Khởi động trang: tải dữ liệu sinh viên từ REST API
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStudents();
+        });
+
+        // 1. Gọi API: GET /api/students
+        function loadStudents(keyword = '') {
+            let url = '/api/students';
+            if (keyword && keyword.trim() !== '') {
+                url += '?keyword=' + encodeURIComponent(keyword.trim());
+            }
+
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error('Không thể tải dữ liệu từ máy chủ');
+                    return res.json();
+                })
+                .then(data => {
+                    allStudents = data;
+                    renderTable(data);
+                    updateStats(data);
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('studentsTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-danger">
+                                <i class="bi bi-exclamation-octagon fs-2 d-block mb-1"></i>
+                                Lỗi kết nối API: ${err.message}
+                            </td>
+                        </tr>
+                    `;
+                });
+        }
+
+        // Render bảng dữ liệu
+        function renderTable(students) {
+            const tbody = document.getElementById('studentsTableBody');
+            document.getElementById('studentCount').innerText = students.length;
+
+            if (!students || students.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary"></i>
+                            Không tìm thấy sinh viên nào trong danh sách.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = students.map(st => `
+                <tr>
+                    <td><span class="badge-code">${escapeHtml(st.studentCode || '')}</span></td>
+                    <td>
+                        <div class="fw-bold text-dark">${escapeHtml(st.fullName || '')}</div>
+                        <small class="text-muted font-monospace" style="font-size: 0.72rem;">${escapeHtml(st.id || '')}</small>
+                    </td>
+                    <td>
+                        <a href="mailto:${escapeHtml(st.email || '')}" class="text-decoration-none text-secondary">
+                            <i class="bi bi-envelope me-1 text-muted"></i>${escapeHtml(st.email || '')}
+                        </a>
+                    </td>
+                    <td>
+                        ${st.phone ? `<i class="bi bi-telephone me-1 text-muted"></i>${escapeHtml(st.phone)}` : '<span class="text-muted fst-italic">--</span>'}
+                    </td>
+                    <td>
+                        <span class="badge-class">${escapeHtml(st.className || 'N/A')}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-1">
+                            <button class="btn btn-sm btn-outline-info" title="Xem chi tiết" onclick="viewStudent('${st.id}')">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" title="Chỉnh sửa" onclick="editStudent('${st.id}')">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Xóa" onclick="confirmDelete('${st.id}', '${escapeHtml(st.fullName || '')}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Cập nhật thống kê
+        function updateStats(students) {
+            document.getElementById('statTotalStudents').innerText = students.length;
+            const classes = new Set(students.map(s => s.className).filter(Boolean));
+            document.getElementById('statTotalClasses').innerText = classes.size;
+            const hasPhone = students.filter(s => s.phone && s.phone.trim() !== '').length;
+            const percent = students.length > 0 ? Math.round((hasPhone / students.length) * 100) : 0;
+            document.getElementById('statPhonePercent').innerText = percent + '%';
+        }
+
+        // Tìm kiếm
+        function searchStudents() {
+            const keyword = document.getElementById('searchInput').value;
+            loadStudents(keyword);
+        }
+
+        function handleSearchKey(event) {
+            if (event.key === 'Enter') {
+                searchStudents();
+            }
+        }
+
+        // Lọc theo lớp
+        function filterByClass() {
+            const selectedClass = document.getElementById('classFilter').value;
+            if (!selectedClass) {
+                renderTable(allStudents);
+            } else {
+                const filtered = allStudents.filter(s => s.className === selectedClass);
+                renderTable(filtered);
+            }
+        }
+
+        function refreshData() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('classFilter').value = '';
+            loadStudents();
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Đã tải lại dữ liệu mới nhất!',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        // 2. Thêm mới: POST /api/students
+        function openAddModal() {
+            document.getElementById('formAddStudent').reset();
+            new bootstrap.Modal(document.getElementById('modalAddStudent')).show();
+        }
+
+        function submitAddStudent(e) {
+            e.preventDefault();
+            const student = {
+                studentCode: document.getElementById('add_studentCode').value.trim(),
+                fullName: document.getElementById('add_fullName').value.trim(),
+                email: document.getElementById('add_email').value.trim(),
+                phone: document.getElementById('add_phone').value.trim(),
+                className: document.getElementById('add_className').value.trim()
+            };
+
+            fetch('/api/students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(student)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Không thể thêm sinh viên');
+                return res.json();
+            })
+            .then(saved => {
+                bootstrap.Modal.getInstance(document.getElementById('modalAddStudent')).hide();
+                Swal.fire('Thành công!', `Đã thêm sinh viên "${saved.fullName}"!`, 'success');
+                loadStudents();
+            })
+            .catch(err => {
+                Swal.fire('Lỗi!', err.message, 'error');
+            });
+        }
+
+        // 3. Xem chi tiết: GET /api/students/{id}
+        function viewStudent(id) {
+            fetch('/api/students/' + id)
+                .then(res => {
+                    if (!res.ok) throw new Error('Không tìm thấy sinh viên');
+                    return res.json();
+                })
+                .then(st => {
+                    document.getElementById('view_id').innerText = st.id;
+                    document.getElementById('view_studentCode').innerText = st.studentCode || '--';
+                    document.getElementById('view_fullName').innerText = st.fullName || '--';
+                    document.getElementById('view_email').innerText = st.email || '--';
+                    document.getElementById('view_phone').innerText = st.phone || '--';
+                    document.getElementById('view_className').innerText = st.className || '--';
+                    new bootstrap.Modal(document.getElementById('modalViewStudent')).show();
+                })
+                .catch(err => Swal.fire('Lỗi!', err.message, 'error'));
+        }
+
+        // 4. Sửa thông tin: PUT /api/students/{id}
+        function editStudent(id) {
+            fetch('/api/students/' + id)
+                .then(res => {
+                    if (!res.ok) throw new Error('Không tìm thấy sinh viên');
+                    return res.json();
+                })
+                .then(st => {
+                    document.getElementById('edit_id').value = st.id;
+                    document.getElementById('edit_studentCode').value = st.studentCode || '';
+                    document.getElementById('edit_fullName').value = st.fullName || '';
+                    document.getElementById('edit_email').value = st.email || '';
+                    document.getElementById('edit_phone').value = st.phone || '';
+                    document.getElementById('edit_className').value = st.className || '';
+                    new bootstrap.Modal(document.getElementById('modalEditStudent')).show();
+                })
+                .catch(err => Swal.fire('Lỗi!', err.message, 'error'));
+        }
+
+        function submitEditStudent(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit_id').value;
+            const student = {
+                studentCode: document.getElementById('edit_studentCode').value.trim(),
+                fullName: document.getElementById('edit_fullName').value.trim(),
+                email: document.getElementById('edit_email').value.trim(),
+                phone: document.getElementById('edit_phone').value.trim(),
+                className: document.getElementById('edit_className').value.trim()
+            };
+
+            fetch('/api/students/' + id, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(student)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Không thể cập nhật sinh viên');
+                return res.json();
+            })
+            .then(updated => {
+                bootstrap.Modal.getInstance(document.getElementById('modalEditStudent')).hide();
+                Swal.fire('Thành công!', `Đã cập nhật sinh viên "${updated.fullName}"!`, 'success');
+                loadStudents();
+            })
+            .catch(err => {
+                Swal.fire('Lỗi!', err.message, 'error');
+            });
+        }
+
+        // 5. Xóa: DELETE /api/students/{id}
+        function confirmDelete(id, name) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: `Bạn có chắc chắn muốn xóa sinh viên "${name}" khỏi cơ sở dữ liệu?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Đồng ý xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/api/students/' + id, {
+                        method: 'DELETE'
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Xóa thất bại');
+                        Swal.fire('Đã xóa!', `Đã xóa thành công sinh viên "${name}"!`, 'success');
+                        loadStudents();
+                    })
+                    .catch(err => {
+                        Swal.fire('Lỗi!', err.message, 'error');
+                    });
+                }
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

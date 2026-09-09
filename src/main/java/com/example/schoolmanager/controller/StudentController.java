@@ -2,19 +2,14 @@ package com.example.schoolmanager.controller;
 
 import com.example.schoolmanager.entity.Student;
 import com.example.schoolmanager.service.StudentService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class StudentController {
@@ -32,91 +27,120 @@ public class StudentController {
         return "redirect:/students";
     }
 
-    // 7️⃣ Lấy danh sách sinh viên (kết hợp Bài tập 3: Tìm kiếm theo tên)
-    // URL: http://localhost:8080/students hoặc http://localhost:8080/students?keyword=Nguyen
+    // ==========================================================
+    // PHẦN B: Trang web HTML cơ bản quản lý sinh viên (/students)
+    // ==========================================================
     @GetMapping("/students")
     public String listStudents(
             @RequestParam(name = "keyword", required = false) String keyword,
             Model model) {
-        List<Student> students = studentService.searchStudents(keyword);
+        List<Student> students = studentService.search(keyword);
         model.addAttribute("students", students);
         model.addAttribute("keyword", keyword != null ? keyword : "");
+        model.addAttribute("newStudent", new Student());
         return "students"; // templates/students.html
     }
 
-    // 🎓 Bài tập 2: Trang chi tiết sinh viên
-    // URL: http://localhost:8080/students/1
-    @GetMapping("/students/{id:[0-9]+}")
-    public String viewStudentDetail(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
-        return studentService.getStudentById(id)
-                .map(student -> {
-                    model.addAttribute("student", student);
-                    return "student-detail"; // templates/student-detail.html
-                })
-                .orElseGet(() -> {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy sinh viên có ID: " + id);
-                    return "redirect:/students";
-                });
+    // Xem chi tiết sinh viên (Trang riêng)
+    @GetMapping("/students/{id}")
+    public String viewStudentDetail(@PathVariable("id") UUID id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            Student student = studentService.getById(id);
+            model.addAttribute("student", student);
+            return "student-detail";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy sinh viên có ID: " + id);
+            return "redirect:/students";
+        }
     }
 
-    // Hiển thị form thêm sinh viên mới
-    // URL: http://localhost:8080/students/new
+    // Trang form thêm sinh viên mới
     @GetMapping("/students/new")
     public String showCreateForm(Model model) {
-        Student student = new Student();
-        student.setGender("Nam"); // Giá trị mặc định
-        model.addAttribute("student", student);
+        model.addAttribute("student", new Student());
         model.addAttribute("pageTitle", "Thêm Sinh Viên Mới");
-        return "student-form"; // templates/student-form.html
+        return "student-form";
     }
 
-    // Hiển thị form chỉnh sửa sinh viên
-    // URL: http://localhost:8080/students/edit/1
+    // Trang form chỉnh sửa sinh viên
     @GetMapping("/students/edit/{id}")
-    public String showEditForm(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
-        return studentService.getStudentById(id)
-                .map(student -> {
-                    model.addAttribute("student", student);
-                    model.addAttribute("pageTitle", "Chỉnh Sửa Thông Tin Sinh Viên");
-                    return "student-form";
-                })
-                .orElseGet(() -> {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy sinh viên có ID: " + id);
-                    return "redirect:/students";
-                });
-    }
-
-    // Xử lý lưu thông tin sinh viên (Cả Thêm mới và Cập nhật)
-    @PostMapping("/students/save")
-    public String saveStudent(
-            @Valid @ModelAttribute("student") Student student,
-            BindingResult bindingResult,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("pageTitle", student.getId() == null ? "Thêm Sinh Viên Mới" : "Chỉnh Sửa Thông Tin Sinh Viên");
-            return "student-form";
-        }
-
-        boolean isNew = (student.getId() == null);
-        studentService.saveStudent(student);
-
-        String message = isNew ? "Thêm sinh viên mới thành công!" : "Cập nhật sinh viên thành công!";
-        redirectAttributes.addFlashAttribute("successMessage", message);
-        return "redirect:/students";
-    }
-
-    // Xử lý xóa sinh viên
-    // URL: http://localhost:8080/students/delete/1
-    @GetMapping("/students/delete/{id}")
-    public String deleteStudent(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+    public String showEditForm(@PathVariable("id") UUID id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            studentService.deleteStudent(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Xóa sinh viên ID " + id + " thành công!");
+            Student student = studentService.getById(id);
+            model.addAttribute("student", student);
+            model.addAttribute("pageTitle", "Chỉnh Sửa Thông Tin Sinh Viên");
+            return "student-form";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa sinh viên: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy sinh viên có ID: " + id);
+            return "redirect:/students";
+        }
+    }
+
+    // Lưu thông tin từ student-form (Thêm mới hoặc Cập nhật)
+    @PostMapping("/students/save")
+    public String saveStudentForm(@ModelAttribute("student") Student student, RedirectAttributes redirectAttributes) {
+        try {
+            boolean isNew = (student.getId() == null);
+            studentService.save(student);
+            redirectAttributes.addFlashAttribute("successMessage", isNew ? "Thêm sinh viên mới thành công!" : "Cập nhật sinh viên thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
         return "redirect:/students";
+    }
+
+    // Thêm sinh viên mới qua modal form (Phần B)
+    @PostMapping("/students/add")
+    public String addStudent(
+            @ModelAttribute("newStudent") Student student,
+            RedirectAttributes redirectAttributes) {
+        try {
+            student.setId(null);
+            studentService.save(student);
+            redirectAttributes.addFlashAttribute("successMessage", "Thêm sinh viên mới thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi thêm sinh viên: " + e.getMessage());
+        }
+        return "redirect:/students";
+    }
+
+    // Cập nhật thông tin sinh viên qua modal form (Phần B)
+    @PostMapping("/students/edit/{id}")
+    public String editStudent(
+            @PathVariable("id") UUID id,
+            @ModelAttribute Student student,
+            RedirectAttributes redirectAttributes) {
+        try {
+            student.setId(id);
+            studentService.save(student);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật sinh viên thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi cập nhật sinh viên: " + e.getMessage());
+        }
+        return "redirect:/students";
+    }
+
+    // Xóa sinh viên qua link/button (Phần B)
+    @GetMapping("/students/delete/{id}")
+    public String deleteStudent(
+            @PathVariable("id") UUID id,
+            RedirectAttributes redirectAttributes) {
+        try {
+            studentService.delete(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa sinh viên thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi xóa sinh viên: " + e.getMessage());
+        }
+        return "redirect:/students";
+    }
+
+    // ==========================================================
+    // PHẦN C: Trang web quản lý sinh viên bằng framework AdminLTE 4
+    // ==========================================================
+    @GetMapping({"/admin", "/admin/students"})
+    public String adminStudents(Model model) {
+        List<Student> students = studentService.getAll();
+        model.addAttribute("totalStudents", students.size());
+        return "admin-students"; // templates/admin-students.html
     }
 }
