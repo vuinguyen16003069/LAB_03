@@ -12,7 +12,7 @@
 
 <br/>
 
-<img src="https://media.tenor.com/zBc1XhcbTSoAAAAM/nyan-cat-rainbow.gif" width="300" alt="Nyan Cat Rainbow" />
+<img src="https://media.tenor.com/zBc1XhcbTSoAAAAM/nyan-cat-rainbow.gif" width="100%" alt="Nyan Cat Rainbow Banner" />
 
 <p align="center">
   <b>Hệ thống Quản lý Sinh viên chuẩn hóa theo yêu cầu LAB 03</b><br/>
