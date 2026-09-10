@@ -3,6 +3,7 @@ package com.example.schoolmanager.controller;
 import com.example.schoolmanager.entity.Student;
 import com.example.schoolmanager.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class StudentController {
 
     // Xem chi tiết sinh viên (Trang riêng)
     @GetMapping("/students/{id}")
-    public String viewStudentDetail(@PathVariable("id") UUID id, Model model, RedirectAttributes redirectAttributes) {
+    public String viewStudentDetail(@PathVariable("id") @NonNull UUID id, Model model, RedirectAttributes redirectAttributes) {
         try {
             Student student = studentService.getById(id);
             model.addAttribute("student", student);
@@ -64,7 +65,7 @@ public class StudentController {
 
     // Trang form chỉnh sửa sinh viên
     @GetMapping("/students/edit/{id}")
-    public String showEditForm(@PathVariable("id") UUID id, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditForm(@PathVariable("id") @NonNull UUID id, Model model, RedirectAttributes redirectAttributes) {
         try {
             Student student = studentService.getById(id);
             model.addAttribute("student", student);
@@ -107,7 +108,7 @@ public class StudentController {
     // Cập nhật thông tin sinh viên qua modal form (Phần B)
     @PostMapping("/students/edit/{id}")
     public String editStudent(
-            @PathVariable("id") UUID id,
+            @PathVariable("id") @NonNull UUID id,
             @ModelAttribute Student student,
             RedirectAttributes redirectAttributes) {
         try {
@@ -123,7 +124,7 @@ public class StudentController {
     // Xóa sinh viên qua link/button (Phần B)
     @GetMapping("/students/delete/{id}")
     public String deleteStudent(
-            @PathVariable("id") UUID id,
+            @PathVariable("id") @NonNull UUID id,
             RedirectAttributes redirectAttributes) {
         try {
             studentService.delete(id);

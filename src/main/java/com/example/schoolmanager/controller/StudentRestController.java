@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class StudentRestController {
     @Operation(summary = "Lấy thông tin chi tiết sinh viên theo ID (UUID)")
     public Student getStudent(
             @Parameter(description = "UUID định danh của sinh viên")
-            @PathVariable UUID id) {
+            @PathVariable @NonNull UUID id) {
         return studentService.getById(id);
     }
 
@@ -47,7 +48,7 @@ public class StudentRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Thêm sinh viên mới")
-    public Student createStudent(@RequestBody Student student) {
+    public Student createStudent(@RequestBody @NonNull Student student) {
         student.setId(null); // Đảm bảo tự tạo UUID mới nếu chưa có
         return studentService.save(student);
     }
@@ -58,8 +59,8 @@ public class StudentRestController {
     @Operation(summary = "Cập nhật thông tin sinh viên theo ID")
     public Student updateStudent(
             @Parameter(description = "UUID của sinh viên cần cập nhật")
-            @PathVariable UUID id,
-            @RequestBody Student student) {
+            @PathVariable @NonNull UUID id,
+            @RequestBody @NonNull Student student) {
         student.setId(id);
         return studentService.save(student);
     }
@@ -70,7 +71,7 @@ public class StudentRestController {
     @Operation(summary = "Xóa sinh viên theo ID")
     public void deleteStudent(
             @Parameter(description = "UUID của sinh viên cần xóa")
-            @PathVariable UUID id) {
+            @PathVariable @NonNull UUID id) {
         studentService.delete(id);
     }
 }
