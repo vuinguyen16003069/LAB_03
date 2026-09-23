@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAB 03 - AdminLTE 4 Quản Lý Sinh Viên (Phần C)</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- AdminLTE 4 CSS (File cục bộ từ thư mục static/adminlte) -->
+    <link rel="stylesheet" href="/adminlte/css/adminlte.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        .badge-code {
+            font-family: monospace;
+            background-color: #e0f2fe;
+            color: #0284c7;
+            font-weight: 700;
+            padding: 0.35rem 0.6rem;
+            border-radius: 4px;
+        }
+        .badge-class {
+            background-color: #fef3c7;
+            color: #b45309;
+            font-weight: 600;
+            padding: 0.35rem 0.6rem;
+            border-radius: 4px;
+        }
+        .small-box {
+            border-radius: 0.75rem;
+            position: relative;
+            display: block;
+            margin-bottom: 20px;
+            box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+            color: #fff;
+            padding: 1.25rem;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .small-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .small-box .inner {
+            position: relative;
+            z-index: 2;
+        }
+        .small-box .icon {
+            position: absolute;
+            right: 15px;
+            bottom: 10px;
+            font-size: 3.8rem;
+            opacity: 0.25;
+            z-index: 1;
+        }
+        .small-box-footer {
+            display: block;
+            padding: 4px 0;
+            margin-top: 10px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .small-box-footer:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper">
+
+        <!-- 1. NAVBAR TRÊN CÙNG -->
+        <nav class="app-header navbar navbar-expand bg-body shadow-sm">
+            <div class="container-fluid">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                            <i class="bi bi-list fs-4"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-md-block">
+                        <a href="student.html" class="nav-link text-primary fw-semibold">
+                            <i class="bi bi-arrow-left-circle me-1"></i> Giao diện cơ bản (Phần B)
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-md-block">
+                        <a href="/swagger-ui/index.html" target="_blank" class="nav-link text-success">
+                            <i class="bi bi-file-earmark-code me-1"></i> Swagger UI ↗
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-md-block">
+                        <a href="/api/students" target="_blank" class="nav-link text-info">
+                            <i class="bi bi-braces me-1"></i> REST API (/api/students) ↗
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                            <i class="bi bi-circle-fill me-1 small"></i> REST API Active
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- 2. SIDEBAR BÊN TRÁI -->
+        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+            <div class="sidebar-brand">
+                <a href="index.html" class="brand-link text-decoration-none">
+                    <i class="bi bi-mortarboard-fill brand-image text-warning fs-3 ms-2 me-2"></i>
+                    <span class="brand-text fw-bold text-white">LAB 03 - ADMIN</span>
+                </a>
+            </div>
+            <div class="sidebar-wrapper">
+                <nav class="mt-3">
+                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
+                        <li class="nav-header text-uppercase text-white-50 px-3 small">Quản Lý Đào Tạo</li>
+                        <li class="nav-item">
+                            <a href="#dashboard" class="nav-link active" onclick="navigateTo('dashboard', event)">
+                                <i class="nav-icon bi bi-speedometer2 text-info"></i>
+                                <p>Bảng Điều Khiển</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#table" class="nav-link" onclick="navigateTo('table', event)">
+                                <i class="nav-icon bi bi-people-fill text-warning"></i>
+                                <p>Danh Sách Sinh Viên</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#form" class="nav-link" onclick="navigateTo('form', event)">
+                                <i class="nav-icon bi bi-person-plus-fill text-success"></i>
+                                <p>Thêm Sinh Viên Mới</p>
+                            </a>
+                        </li>
+                        <li class="nav-header text-uppercase text-white-50 px-3 small mt-3">Liên Kết Ngoài</li>
+                        <li class="nav-item">
+                            <a href="student.html" class="nav-link">
+                                <i class="nav-icon bi bi-file-earmark-code text-primary"></i>
+                                <p>Giao Diện HTML (Phần B)</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/swagger-ui/index.html" target="_blank" class="nav-link">
+                                <i class="nav-icon bi bi-journal-code text-success"></i>
+                                <p>Swagger API Docs ↗</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/api/students" target="_blank" class="nav-link">
+                                <i class="nav-icon bi bi-database-check text-info"></i>
+                                <p>API JSON ↗</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- 3. NỘI DUNG CHÍNH (MAIN CONTENT) -->
+        <main class="app-main p-4">
+
+            <!-- ===================== SECTION 1: DASHBOARD ===================== -->
+            <section id="section-dashboard" class="content-section active">
+                <div class="app-content-header mb-4">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-sm-6">
+                                <h3 class="mb-1 fw-bold text-dark">Tổng Quan Hệ Thống</h3>
+                                <p class="text-muted mb-0 small">Báo cáo & thống kê dữ liệu sinh viên từ SQL Server</p>
+                            </div>
+                            <div class="col-sm-6 text-end">
+                                <button class="btn btn-primary" onclick="navigateTo('form')">
+                                    <i class="bi bi-plus-circle me-1"></i> Thêm Sinh Viên Mới
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 Thẻ Thống Kê KPI (Small Boxes) -->
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-primary">
+                            <div class="inner">
+                                <h3 id="statTotalStudents" class="fw-bold mb-1">0</h3>
+                                <p class="mb-0">Tổng Số Sinh Viên</p>
+                            </div>
+                            <i class="small-box-icon bi bi-people-fill icon"></i>
+                            <a href="#table" onclick="navigateTo('table', event)" class="small-box-footer">
+                                Xem chi tiết <i class="bi bi-arrow-right-circle ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3 id="statTotalClasses" class="fw-bold mb-1">0</h3>
+                                <p class="mb-0">Số Lớp Đang Học</p>
+                            </div>
+                            <i class="small-box-icon bi bi-building-check icon"></i>
+                            <a href="#table" onclick="navigateTo('table', event)" class="small-box-footer">
+                                Xem lớp học <i class="bi bi-arrow-right-circle ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3 class="fw-bold mb-1">SQL Server</h3>
+                                <p class="mb-0">Database: quanlysinhvien</p>
+                            </div>
+                            <i class="small-box-icon bi bi-database-fill-gear icon"></i>
+                            <a href="/swagger-ui/index.html" target="_blank" class="small-box-footer text-dark">
+                                Kiểm tra Schema <i class="bi bi-arrow-right-circle ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3 class="fw-bold mb-1">5 APIs</h3>
+                                <p class="mb-0">RESTful Controller</p>
+                            </div>
+                            <i class="small-box-icon bi bi-lightning-charge-fill icon"></i>
+                            <a href="/swagger-ui/index.html" target="_blank" class="small-box-footer">
+                                Thử nghiệm API <i class="bi bi-arrow-right-circle ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảng Sinh Viên Tóm Tắt Trong Dashboard -->
+                <div class="card card-primary card-outline shadow-sm mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title fw-bold mb-0 text-primary">
+                            <i class="bi bi-clock-history me-1"></i> Sinh Viên Mới Cập Nhật
+                        </h5>
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadAdminStudents()">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Làm mới dữ liệu
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mã SV</th>
+                                        <th>Họ và Tên</th>
+                                        <th>Email</th>
+                                        <th>Số Điện Thoại</th>
+                                        <th>Lớp</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboardRecentBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">Đang tải dữ liệu...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== SECTION 2: TABLE VIEW ===================== -->
+            <section id="section-table" class="content-section">
+                <div class="app-content-header mb-4">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-sm-6">
+                                <h3 class="mb-1 fw-bold text-dark">Quản Lý Danh Sách Sinh Viên</h3>
+                                <p class="text-muted mb-0 small">Hiển thị, tìm kiếm, sửa đổi và xóa sinh viên qua REST API</p>
+                            </div>
+                            <div class="col-sm-6 text-end">
+                                <button class="btn btn-success" onclick="navigateTo('form')">
+                                    <i class="bi bi-person-plus-fill me-1"></i> Thêm Sinh Viên
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Khung tìm kiếm & lọc lớp -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-3">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-5">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                    <input type="text" id="adminSearchInput" class="form-control border-start-0" placeholder="Tìm theo Mã SV, Họ tên, Email, SĐT..." />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="adminClassFilter" class="form-select">
+                                    <option value="">-- Tất cả các lớp --</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-outline-secondary" onclick="resetAdminSearch()">
+                                    <i class="bi bi-arrow-clockwise me-1"></i> Đặt lại
+                                </button>
+                            </div>
+                            <div class="col text-end">
+                                <span id="adminResultCount" class="badge bg-primary-subtle text-primary fs-6 px-3 py-2">0 sinh viên</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảng Sinh Viên Đầy Đủ -->
+                <div class="card card-outline card-primary shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 15%;">Mã sinh viên</th>
+                                        <th style="width: 20%;">Họ và tên</th>
+                                        <th style="width: 20%;">Email</th>
+                                        <th style="width: 18%;">Số điện thoại</th>
+                                        <th style="width: 12%;">Lớp</th>
+                                        <th style="width: 15%;" class="text-end">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">Đang tải dữ liệu...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== SECTION 3: FORM VIEW ===================== -->
+            <!-- Hỗ trợ trực tiếp index.html?page=form&id=...&mode=view / edit theo chuẩn student.js -->
+            <section id="section-form" class="content-section">
+                <div class="app-content-header mb-4">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-sm-6">
+                                <h3 id="formSectionTitle" class="mb-1 fw-bold text-dark">Thêm Sinh Viên Mới</h3>
+                                <p class="text-muted mb-0 small">Điền các thông tin của sinh viên để cập nhật cơ sở dữ liệu</p>
+                            </div>
+                            <div class="col-sm-6 text-end">
+                                <button class="btn btn-outline-secondary" onclick="navigateTo('table')">
+                                    <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card card-outline card-success shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h5 id="formCardHeader" class="card-title fw-bold text-success mb-0">
+                                    <i class="bi bi-file-earmark-person me-2"></i>Biểu mẫu thông tin sinh viên
+                                </h5>
+                            </div>
+                            <form id="adminStudentForm">
+                                <div class="card-body p-4">
+                                    <input type="hidden" id="formStudentId" />
+                                    
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Mã Sinh Viên <span class="text-danger">*</span></label>
+                                            <input type="text" id="formStudentCode" class="form-control" placeholder="Ví dụ: SV001" required />
+                                            <div class="form-text">Mã định danh duy nhất của sinh viên</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Họ và Tên <span class="text-danger">*</span></label>
+                                            <input type="text" id="formFullName" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                                            <input type="email" id="formEmail" class="form-control" placeholder="Ví dụ: a@gmail.com" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Số Điện Thoại</label>
+                                            <input type="tel" id="formPhone" class="form-control" placeholder="Ví dụ: 0901234567" />
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-semibold">Lớp Học</label>
+                                            <input type="text" id="formClassName" class="form-control" placeholder="Ví dụ: C2024A" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-light p-3 d-flex justify-content-between align-items-center">
+                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('table')">
+                                        <i class="bi bi-x-circle me-1"></i> Hủy bỏ
+                                    </button>
+                                    <button type="submit" id="btnSubmitForm" class="btn btn-primary px-4 fw-semibold">
+                                        <i class="bi bi-save me-1"></i> Lưu Sinh Viên
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="app-footer text-center py-3 bg-white border-top text-muted small">
+            <strong>LAB 03: CRUD API Sinh Viên</strong> &copy; Spring Boot + SQL Server + AdminLTE 4.
+        </footer>
+    </div>
+
+    <!-- Scripts: Bootstrap, AdminLTE, SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/adminlte/js/adminlte.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        const API_URL = "/api/students";
+        let allStudents = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Kiểm tra tham số URL (?page=form&id=...&mode=view/edit)
+            handleUrlParams();
+            loadAdminStudents();
+            setupAdminEventListeners();
+        });
+
+        // 1. Tải danh sách sinh viên từ API
+        async function loadAdminStudents(keyword = "") {
+            try {
+                let url = API_URL;
+                if (keyword && keyword.trim() !== "") {
+                    url += `?keyword=${encodeURIComponent(keyword.trim())}`;
+                }
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("HTTP " + response.status);
+                allStudents = await response.json();
+
+                renderAdminDashboard(allStudents);
+                renderAdminTable(allStudents);
+                populateClassFilter(allStudents);
+            } catch (err) {
+                console.error("Lỗi nạp dữ liệu sinh viên:", err);
+                Swal.fire({
+                    icon: "error",
+                    title: "Không thể nạp dữ liệu",
+                    text: "Vui lòng đảm bảo server Spring Boot đang chạy: " + err.message
+                });
+            }
+        }
+
+        // 2. Render Dashboard KPIs
+        function renderAdminDashboard(students) {
+            document.getElementById("statTotalStudents").textContent = students.length;
+            const uniqueClasses = new Set(students.map(s => s.className).filter(Boolean));
+            document.getElementById("statTotalClasses").textContent = uniqueClasses.size;
+
+            const recentTbody = document.getElementById("dashboardRecentBody");
+            recentTbody.innerHTML = "";
+            const recent = students.slice(0, 5);
+            if (recent.length === 0) {
+                recentTbody.innerHTML = `<tr><td colspan="5" class="text-center py-3 text-muted">Chưa có dữ liệu</td></tr>`;
+                return;
+            }
+            recent.forEach(s => {
+                recentTbody.innerHTML += `
+                    <tr>
+                        <td><span class="badge-code">${escapeHtml(s.studentCode)}</span></td>
+                        <td class="fw-semibold">${escapeHtml(s.fullName)}</td>
+                        <td>${escapeHtml(s.email)}</td>
+                        <td>${escapeHtml(s.phone || '-')}</td>
+                        <td><span class="badge-class">${escapeHtml(s.className || 'N/A')}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 3. Render Bảng Sinh Viên
+        function renderAdminTable(students) {
+            const tbody = document.getElementById("adminTableBody");
+            tbody.innerHTML = "";
+
+            document.getElementById("adminResultCount").textContent = `${students.length} sinh viên`;
+
+            if (students.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-3 d-block mb-1"></i> Không tìm thấy sinh viên nào.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            students.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span class="badge-code">${escapeHtml(s.studentCode)}</span></td>
+                        <td class="fw-semibold">${escapeHtml(s.fullName)}</td>
+                        <td><a href="mailto:${escapeHtml(s.email)}" class="text-decoration-none text-secondary">${escapeHtml(s.email)}</a></td>
+                        <td>${s.phone ? `<a href="tel:${escapeHtml(s.phone)}" class="text-decoration-none text-secondary">${escapeHtml(s.phone)}</a>` : '<span class="text-muted fst-italic">Chưa có</span>'}</td>
+                        <td><span class="badge-class">${escapeHtml(s.className || 'N/A')}</span></td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-1">
+                                <button class="btn btn-info btn-sm text-white" onclick="viewStudentForm('${s.id}')" title="Xem">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-warning btn-sm text-dark" onclick="editStudentForm('${s.id}')" title="Sửa">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="confirmDeleteStudent('${s.id}', '${escapeHtml(s.fullName)}')" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 4. Lọc lớp học
+        function populateClassFilter(students) {
+            const select = document.getElementById("adminClassFilter");
+            const currentVal = select.value;
+            const classes = Array.from(new Set(students.map(s => s.className).filter(Boolean))).sort();
+            
+            select.innerHTML = '<option value="">-- Tất cả các lớp --</option>';
+            classes.forEach(c => {
+                select.innerHTML += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`;
+            });
+            select.value = currentVal;
+        }
+
+        // 5. Điều hướng Section (SPA Tabs)
+        function navigateTo(sectionName, event) {
+            if (event) event.preventDefault();
+            document.querySelectorAll(".content-section").forEach(sec => sec.classList.remove("active"));
+            document.querySelectorAll(".sidebar-menu .nav-link").forEach(link => link.classList.remove("active"));
+
+            const targetSection = document.getElementById("section-" + sectionName);
+            if (targetSection) targetSection.classList.add("active");
+
+            const activeLink = document.querySelector(`.sidebar-menu a[href="#${sectionName}"]`);
+            if (activeLink) activeLink.classList.add("active");
+
+            if (sectionName === "form") {
+                resetForm();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 6. Xử lý URL Params (?page=form&id=...&mode=view/edit)
+        function handleUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const page = params.get("page");
+            const id = params.get("id");
+            const mode = params.get("mode");
+
+            if (page === "form") {
+                navigateTo("form");
+                if (id) {
+                    if (mode === "view") {
+                        viewStudentForm(id);
+                    } else {
+                        editStudentForm(id);
+                    }
+                }
+            }
+        }
+
+        // 7. Mở Form ở chế độ Xem
+        async function viewStudentForm(id) {
+            navigateTo("form");
+            document.getElementById("formSectionTitle").textContent = "Chi Tiết Sinh Viên";
+            document.getElementById("formCardHeader").innerHTML = '<i class="bi bi-eye me-2"></i>Xem thông tin sinh viên';
+            document.getElementById("btnSubmitForm").style.display = "none";
+
+            setFormDisabled(true);
+            await loadStudentIntoForm(id);
+        }
+
+        // 8. Mở Form ở chế độ Sửa
+        async function editStudentForm(id) {
+            navigateTo("form");
+            document.getElementById("formSectionTitle").textContent = "Cập Nhật Sinh Viên";
+            document.getElementById("formCardHeader").innerHTML = '<i class="bi bi-pencil-square me-2"></i>Chỉnh sửa thông tin sinh viên';
+            const btn = document.getElementById("btnSubmitForm");
+            btn.style.display = "inline-block";
+            btn.innerHTML = '<i class="bi bi-save me-1"></i> Lưu Cập Nhật';
+
+            setFormDisabled(false);
+            await loadStudentIntoForm(id);
+        }
+
+        function resetForm() {
+            document.getElementById("adminStudentForm").reset();
+            document.getElementById("formStudentId").value = "";
+            document.getElementById("formSectionTitle").textContent = "Thêm Sinh Viên Mới";
+            document.getElementById("formCardHeader").innerHTML = '<i class="bi bi-person-plus me-2"></i>Điền thông tin sinh viên mới';
+            const btn = document.getElementById("btnSubmitForm");
+            btn.style.display = "inline-block";
+            btn.innerHTML = '<i class="bi bi-save me-1"></i> Thêm Sinh Viên';
+            setFormDisabled(false);
+        }
+
+        function setFormDisabled(disabled) {
+            ["formStudentCode", "formFullName", "formEmail", "formPhone", "formClassName"].forEach(id => {
+                document.getElementById(id).disabled = disabled;
+            });
+        }
+
+        async function loadStudentIntoForm(id) {
+            try {
+                const res = await fetch(`${API_URL}/${id}`);
+                if (!res.ok) throw new Error("Không tìm thấy sinh viên ID: " + id);
+                const s = await res.json();
+                document.getElementById("formStudentId").value = s.id || "";
+                document.getElementById("formStudentCode").value = s.studentCode || "";
+                document.getElementById("formFullName").value = s.fullName || "";
+                document.getElementById("formEmail").value = s.email || "";
+                document.getElementById("formPhone").value = s.phone || "";
+                document.getElementById("formClassName").value = s.className || "";
+            } catch (err) {
+                Swal.fire("Lỗi", err.message, "error");
+            }
+        }
+
+        // 9. Xác nhận và Xóa sinh viên
+        function confirmDeleteStudent(id, name) {
+            Swal.fire({
+                title: "Xác nhận xóa?",
+                html: `Bạn có chắc muốn xóa sinh viên <strong>${name}</strong>?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Đồng ý xóa",
+                cancelButtonText: "Hủy"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+                        if (!res.ok) throw new Error("Lỗi máy chủ " + res.status);
+                        Swal.fire("Thành công!", "Đã xóa sinh viên khỏi hệ thống.", "success");
+                        loadAdminStudents();
+                    } catch (err) {
+                        Swal.fire("Lỗi xóa", err.message, "error");
+                    }
+                }
+            });
+        }
+
+        // 10. Sự kiện form tìm kiếm & lọc
+        function setupAdminEventListeners() {
+            const searchInput = document.getElementById("adminSearchInput");
+            const classFilter = document.getElementById("adminClassFilter");
+
+            const filterData = () => {
+                const keyword = searchInput.value.trim().toLowerCase();
+                const selectedClass = classFilter.value;
+
+                let filtered = allStudents;
+                if (keyword) {
+                    filtered = filtered.filter(s =>
+                        (s.studentCode && s.studentCode.toLowerCase().includes(keyword)) ||
+                        (s.fullName && s.fullName.toLowerCase().includes(keyword)) ||
+                        (s.email && s.email.toLowerCase().includes(keyword)) ||
+                        (s.phone && s.phone.toLowerCase().includes(keyword))
+                    );
+                }
+                if (selectedClass) {
+                    filtered = filtered.filter(s => s.className === selectedClass);
+                }
+                renderAdminTable(filtered);
+            };
+
+            searchInput.addEventListener("input", filterData);
+            classFilter.addEventListener("change", filterData);
+
+            document.getElementById("adminStudentForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const idVal = document.getElementById("formStudentId").value.trim();
+                const studentData = {
+                    studentCode: document.getElementById("formStudentCode").value.trim(),
+                    fullName: document.getElementById("formFullName").value.trim(),
+                    email: document.getElementById("formEmail").value.trim(),
+                    phone: document.getElementById("formPhone").value.trim(),
+                    className: document.getElementById("formClassName").value.trim()
+                };
+                if (idVal) studentData.id = idVal;
+
+                const isEdit = Boolean(idVal);
+                const url = isEdit ? `${API_URL}/${idVal}` : API_URL;
+                const method = isEdit ? "PUT" : "POST";
+
+                try {
+                    const res = await fetch(url, {
+                        method: method,
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(studentData)
+                    });
+                    if (!res.ok) {
+                        const err = await res.text();
+                        throw new Error(err || "Lỗi máy chủ " + res.status);
+                    }
+
+                    Swal.fire({
+                        icon: "success",
+                        title: isEdit ? "Cập nhật thành công!" : "Thêm mới thành công!",
+                        text: `Sinh viên ${studentData.fullName} đã được lưu vào hệ thống.`,
+                        timer: 2000
+                    });
+
+                    await loadAdminStudents();
+                    navigateTo("table");
+                } catch (err) {
+                    Swal.fire("Lỗi lưu sinh viên", err.message, "error");
+                }
+            });
+        }
+
+        function resetAdminSearch() {
+            document.getElementById("adminSearchInput").value = "";
+            document.getElementById("adminClassFilter").value = "";
+            renderAdminTable(allStudents);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
